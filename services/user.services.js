@@ -84,15 +84,43 @@ async function userProfile({email}, callback){
     if(err){
       return callback(err);
     }else {
-      console.log("Coming here")
-      console.log(data);
       return callback(null, data);
     }
   });
 }
 
+async function updateUser(params, callback){
+  let selectQuery =
+    'UPDATE ?? SET ?? = ?, ?? = ?, ?? = ?, ?? = ?, ?? = ? WHERE ?? = ?';
+  let query = mysql.format(selectQuery,[
+    "users",
+    "username",
+    params.username,
+    'full_name',
+    params.full_name,
+    'dob',
+    params.dob,
+    'gender',
+    params.gender,
+    'country',
+    params.country,
+    "email",
+    params.email,
+  ]);
+
+  db.query(query, (err, data) => {
+    console.log('Testing', data);
+    if(err){
+      return callback(err);
+    } else {
+      return callback(null, "User updated");
+    }
+  });
+};
+
 module.exports = {
   login,
   register,
   userProfile,
+  updateUser,
 };

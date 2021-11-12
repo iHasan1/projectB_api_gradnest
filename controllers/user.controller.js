@@ -6,7 +6,7 @@ const userServices = require("../services/user.services");
  * 2. In the SignIn API, we are checking whether the assigned and retrieved passwords are the same or not using the bcrypt.compare() method.
  * 3. In the SignIn API, we set the JWT token expiration time. Token will be expired within the defined duration.
  */
-exports.register = (req, res, next) => {
+const register = (req, res, next) => {
   const { password } = req.body;
 
   const salt = bcrypt.genSaltSync(10);
@@ -24,7 +24,7 @@ exports.register = (req, res, next) => {
   });
 };
 
-exports.login = (req, res, next) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   userServices.login({ email, password }, (error, results) => {
@@ -38,7 +38,7 @@ exports.login = (req, res, next) => {
   });
 };
 
-exports.userProfile = (req, res, next) => {
+const userProfile = (req, res, next) => {
   const email = req.params.email;
 
   userServices.userProfile({email}, (error, results) => {
@@ -53,3 +53,24 @@ exports.userProfile = (req, res, next) => {
   });
   // return res.status(401).json({ message: "Authorized User!!" });
 };
+
+const updateUser = (req, res, next) => {
+  userServices.updateUser(req.body, (error, results) => {
+    if (error) {
+      return next(error)
+    }
+    return res.status(200).send({
+      message: 'Success',
+      data: results,
+    })
+  })
+};
+
+
+
+module.exports = {
+  login,
+  register,
+  userProfile,
+  updateUser,
+}
