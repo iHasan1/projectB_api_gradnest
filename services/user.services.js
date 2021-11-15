@@ -2,14 +2,24 @@
 const mysql = require('mysql');
 const bcrypt = require("bcryptjs");
 const auth = require("../middlewares/auth.js");
-
+const {body, validationResult} = require('express-validator');
 const otpGenerator = require("otp-generator");
 const crypto = require("crypto");
 const key = "verysecretkey"; // Key for cryptograpy. Keep it secret
-var msg91 = require("msg91")("API_KEY", "SENDER_ID", "ROUTE_NO");
 const { db } = require('../config/db.config');
 
 async function login({ email, password }, callback) {
+
+  if(email === ""){
+    return callback({
+      message: 'Email cannot be empty!',
+    });
+  }
+  if (password === ""){
+    return callback({
+      message: 'Password cannot be empty!',
+    });
+  }
   
   let selectQuery = 'SELECT COUNT(*) AS "total", ?? FROM ?? WHERE ?? = ? LIMIT 1';
   let query =  mysql.format(selectQuery, ["password", "users", "email", email]);
@@ -38,12 +48,40 @@ async function login({ email, password }, callback) {
 }
 
 async function register(params, callback) {
-  if (params.username === undefined) {
-    return callback({ message: "Username Required"});
+  if (params.username.replace(/\s+/g, '').length === 0) {
+    return callback({ message: 'Username Required' });
   }
 
-  if (params.email === undefined) {
-    return callback({ message: 'Email Required' });
+  if (
+    params.email.replace(/\s+/g, '').length === 0 ||
+    params.email.replace(/\s+/g, '').includes('@') === false) {
+    return callback({ message: 'Email Required' })
+  }
+
+  if (params.password.length === 0) {
+    return callback({ message: 'Password Required' });
+  }
+
+  if (params.full_name.replace(/\s+/g, '').length === 0) {
+    return callback({ message: 'Full name Required' });
+  }
+
+  if (params.country.replace(/\s+/g, '').length === 0) {
+    return callback({ message: 'Country Required' });
+  }
+
+  if (
+    params.gender.replace(/\s+/g, '') < 0 &&
+    params.gender.replace(/\s+/g, '') > 1) {
+    return callback({ message: 'Gender Required' })
+  }
+
+  if (params.user_type.replace(/\s+/g, '').length === 0) {
+    return callback({ message: 'User type Required' })
+  }
+
+  if (params.country.replace(/\s+/g, '').length !== '^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$') {
+    return callback({ message: 'Incorrect Date' })
   }
 
   let selectQuery = 'SELECT COUNT(*) AS "total" FROM ?? WHERE ?? = ? LIMIT 1';
@@ -118,9 +156,32 @@ async function updateUser(params, callback){
   });
 };
 
+async function deactivateUser(params, callback){
+  let selectQuery =
+    'UPDATE ?? SET ?? = ? WHERE ?? = ?';
+  let query = mysql.format(selectQuery,[
+    "users",
+    "status",
+    0,
+    "email",
+    params.email,
+  ]);
+
+  db.query(query, (err, data) => {
+    // console.log('Testing', data);
+    if(err){
+      return callback(err);
+    } else {
+      return callback(null, "User deactivated.");
+    }
+  });
+};
+
+
 module.exports = {
   login,
   register,
   userProfile,
   updateUser,
+  deactivateUser,
 };

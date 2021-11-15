@@ -66,11 +66,22 @@ const updateUser = (req, res, next) => {
   })
 };
 
-
+const deactivateUser = (req, res, next) => {
+  userServices.deactivateUser(req.body, (error, results) => {
+    if (error) {
+      return next(error)
+    }
+    return res.status(200).send({
+      message: 'Success',
+      data: results,
+    })
+  })
+}
 
 module.exports = {
   login,
   register,
   userProfile,
   updateUser,
+  deactivateUser,
 }

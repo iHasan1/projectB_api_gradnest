@@ -11,10 +11,11 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "express-unless": "^1.0.0",
+    "express-validator": "^6.13.0",
     "jsonwebtoken": "^8.5.1",
-    "msg91": "^0.0.6",
     "mysql": "^2.18.1",
     "otp-generator": "^3.0.0"
   },
