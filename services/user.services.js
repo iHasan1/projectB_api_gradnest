@@ -24,11 +24,12 @@ async function login({ email, password }, callback) {
   let selectQuery = 'SELECT COUNT(*) AS "total", ?? FROM ?? WHERE ?? = ? LIMIT 1';
   let query =  mysql.format(selectQuery, ["password", "users", "email", email]);
 
+
   db.query(query, (err, data) => {
     if(err){
       return callback(null);
     }
-
+    console.log()
     if(data[0].total == 0){
       return callback({
         message: "Invalid Username/Password!",  
@@ -80,9 +81,9 @@ async function register(params, callback) {
     return callback({ message: 'User type Required' })
   }
 
-  if (params.country.replace(/\s+/g, '').length !== '^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$') {
-    return callback({ message: 'Incorrect Date' })
-  }
+  // if (params.country.replace(/\s+/g, '').length !== '^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$') {
+  //   return callback({ message: 'Incorrect Date' })
+  // }
 
   let selectQuery = 'SELECT COUNT(*) AS "total" FROM ?? WHERE ?? = ? LIMIT 1';
   let query = mysql.format(selectQuery, [
@@ -120,6 +121,7 @@ async function userProfile({email}, callback){
 
   db.query(query, (err, data) =>{
     if(err){
+      console.log(err);
       return callback(err);
     }else {
       return callback(null, data);

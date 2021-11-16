@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require('cors')
 const app = express();
 // const mongoose = require("mongoose");
 // const dbConfig = require("./config/db.config");
@@ -34,6 +35,8 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use(cors());
 
 // initialize routes
 app.use("/users", require("./routes/users.routes"));

@@ -1,7 +1,11 @@
 const usersController = require("../controllers/user.controller");
+// const cors = require('cors');
 
 const express = require("express");
+const { application } = require("express");
 const router = express.Router();
+
+// app.use(cors());
 
 router.post("/register", usersController.register);
 router.post("/login", usersController.login);
