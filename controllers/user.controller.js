@@ -38,12 +38,11 @@ const login = (req, res, next) => {
   });
 };
 
-const userProfile = (req, res, next) => {
+const userProfile = (req, res) => {
   const email = req.params.email;
-
   userServices.userProfile({email}, (error, results) => {
     if(error){
-      return next(error);
+      return res.status(401).json({ message: 'Unauthorized User!!' });
     }
 
     return res.status(200).json({
@@ -51,7 +50,6 @@ const userProfile = (req, res, next) => {
       data: results,
     });
   });
-  // return res.status(401).json({ message: "Authorized User!!" });
 };
 
 const updateUser = (req, res, next) => {

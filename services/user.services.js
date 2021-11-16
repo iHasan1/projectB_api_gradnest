@@ -29,7 +29,7 @@ async function login({ email, password }, callback) {
     if(err){
       return callback(null);
     }
-    console.log()
+    // console.log()
     if(data[0].total == 0){
       return callback({
         message: "Invalid Username/Password!",  
@@ -115,16 +115,19 @@ async function register(params, callback) {
 }
 
 async function userProfile({email}, callback){
-  console.log(email)
   let selectQuery = 'SELECT * FROM ?? WHERE ?? = ?';
   let query = mysql.format(selectQuery, ["users", "email", email]);
-
-  db.query(query, (err, data) =>{
-    if(err){
-      console.log(err);
-      return callback(err);
-    }else {
-      return callback(null, data);
+  
+  db.query(query, (error, data) =>{
+    if(error){
+      return callback(error);
+    }
+    
+    if(data < 1){
+      return callback({ message: 'User does not exist!' })
+    }
+    else {
+      return callback(null, data)
     }
   });
 }
