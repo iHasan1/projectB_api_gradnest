@@ -8,6 +8,7 @@ const auth = require("./middlewares/auth.js");
 const errors = require("./middlewares/errors.js");
 const unless = require("express-unless");
 
+app.use(cors());
 // connect to mongodb
 
 /**
@@ -36,7 +37,6 @@ app.use(
 
 app.use(express.json());
 
-app.use(cors());
 
 // initialize routes
 app.use("/users", require("./routes/users.routes"));
