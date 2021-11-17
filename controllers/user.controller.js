@@ -39,8 +39,9 @@ const login = (req, res, next) => {
 };
 
 const userProfile = (req, res) => {
-  const email = req.params.email;
-  userServices.userProfile({email}, (error, results) => {
+  const email = req.body;
+  // console.log(email, typeof email);
+  userServices.userProfile( email, (error, results) => {
     if(error){
       return res.status(401).json({ message: 'Unauthorized User!!' });
     }
@@ -53,10 +54,15 @@ const userProfile = (req, res) => {
 };
 
 const updateUser = (req, res, next) => {
-  userServices.updateUser(req.body, (error, results) => {
+  userServices.updateUser(req.body, ({error}, { message: results}) => {
     if (error) {
-      return next(error)
+      console.log(error);
+      return res.status(400).send({
+        message: 'Failed',
+        data: results,
+      }) 
     }
+    console.log(error, results)
     return res.status(200).send({
       message: 'Success',
       data: results,

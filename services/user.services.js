@@ -26,26 +26,26 @@ async function login({ email, password }, callback) {
 
 
   db.query(query, (err, data) => {
-    if(err){
-      return callback(null);
+    if (err) {
+      // console.error(err);
+      return callback(err);
     }
     // console.log()
-    if(data[0].total == 0){
+    if (data[0].total == 0) {
       return callback({
-        message: "Invalid Username/Password!",  
-      });
-    }
-    else {
+        message: 'Invalid Username/Password!',
+      })
+    } else {
       if (bcrypt.compareSync(password, data[0].password)) {
-        const token = auth.generateAccessToken(email);
-        return callback(null, token);
+        const token = auth.generateAccessToken(email)
+        return callback(null, token)
       } else {
         return callback({
           message: 'Invalid Username/Password!',
-        });
+        })
       }
     }
-  });
+  })
 }
 
 async function register(params, callback) {
@@ -126,15 +126,14 @@ async function userProfile({email}, callback){
     if(data < 1){
       return callback({ message: 'User does not exist!' })
     }
-    else {
-      return callback(null, data)
-    }
+
+    return callback(null, data);
   });
 }
 
 async function updateUser(params, callback){
   let selectQuery =
-    'UPDATE ?? SET ?? = ?, ?? = ?, ?? = ?, ?? = ?, ?? = ? WHERE ?? = ?';
+    'UPDATE ?? SET ?? = ?, ?? = ?, ?? = ?, ?? = ?, ?? = ?, ?? = ? WHERE ?? = ?';
   let query = mysql.format(selectQuery,[
     "users",
     "username",
@@ -149,15 +148,23 @@ async function updateUser(params, callback){
     params.country,
     "email",
     params.email,
+    "id",
+    params.id,
   ]);
 
-  db.query(query, (err, data) => {
-    console.log('Testing', data);
+  db.query(query, (err, data, fields) => {
+    // console.log('Testing', data);
     if(err){
-      return callback(err);
-    } else {
-      return callback(null, "User updated");
+      return callback({error:err}, {message:'Update Denied'});
     }
+    if(data.changedRows < 1){
+      return callback({ error: new Error('Could not update Mysql')}, {message:'Update Failed'});
+    }
+    
+    return callback(
+      {error: false},
+      {message: "User Updated"}
+    );
   });
 };
 
