@@ -21,8 +21,8 @@ async function login({ email, password }, callback) {
     });
   }
   
-  let selectQuery = 'SELECT COUNT(*) AS "total", ?? FROM ?? WHERE ?? = ? LIMIT 1';
-  let query =  mysql.format(selectQuery, ["password", "users", "email", email]);
+  let selectQuery = 'SELECT COUNT(*) AS "total", ??, ?? FROM ?? WHERE ?? = ? LIMIT 1';
+  let query =  mysql.format(selectQuery, ["password","status", "users", "email", email]);
 
 
   db.query(query, (err, data) => {
@@ -30,15 +30,20 @@ async function login({ email, password }, callback) {
       // console.error(err);
       return callback(err);
     }
-    // console.log()
+    console.log(data[0]);
     if (data[0].total == 0) {
       return callback({
         message: 'Invalid Username/Password!',
       })
     } else {
+      if(data[0].status == 0){
+        return callback({
+          message: 'Account Disabled, contact Admin'
+        });
+      };
       if (bcrypt.compareSync(password, data[0].password)) {
-        const token = auth.generateAccessToken(email)
-        return callback(null, token)
+        const token = auth.generateAccessToken(email);
+        return callback(null, token);
       } else {
         return callback({
           message: 'Invalid Username/Password!',
