@@ -39,9 +39,10 @@ const login = (req, res, next) => {
 };
 
 const userProfile = (req, res) => {
-  const email = req.body;
+  const id = req.params.id;
+  console.log(id);
   // console.log(email, typeof email);
-  userServices.userProfile( email, (error, results) => {
+  userServices.userProfile( id, (error, results) => {
     if(error){
       return res.status(401).json({ message: 'Unauthorized User!!' });
     }

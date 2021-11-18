@@ -21,8 +21,8 @@ async function login({ email, password }, callback) {
     });
   }
   
-  let selectQuery = 'SELECT COUNT(*) AS "total", ??, ?? FROM ?? WHERE ?? = ? LIMIT 1';
-  let query =  mysql.format(selectQuery, ["password","status", "users", "email", email]);
+  let selectQuery = 'SELECT COUNT(*) AS "total", ??, ??, ?? FROM ?? WHERE ?? = ? LIMIT 1';
+  let query =  mysql.format(selectQuery, ["password","status", "id", "users", "email", email]);
 
 
   db.query(query, (err, data) => {
@@ -30,7 +30,7 @@ async function login({ email, password }, callback) {
       // console.error(err);
       return callback(err);
     }
-    console.log(data[0]);
+    // console.log(data[0]);
     if (data[0].total == 0) {
       return callback({
         message: 'Invalid Username/Password!',
@@ -43,7 +43,7 @@ async function login({ email, password }, callback) {
       };
       if (bcrypt.compareSync(password, data[0].password)) {
         const token = auth.generateAccessToken(email);
-        return callback(null, token);
+        return callback(null, {token: token, id: data[0].id});
       } else {
         return callback({
           message: 'Invalid Username/Password!',
@@ -119,9 +119,10 @@ async function register(params, callback) {
   });
 }
 
-async function userProfile({email}, callback){
+async function userProfile(id, callback){
+  console.log("services Id: ",id);
   let selectQuery = 'SELECT * FROM ?? WHERE ?? = ?';
-  let query = mysql.format(selectQuery, ["users", "email", email]);
+  let query = mysql.format(selectQuery, ["users", "id", id]);
   
   db.query(query, (error, data) =>{
     if(error){
