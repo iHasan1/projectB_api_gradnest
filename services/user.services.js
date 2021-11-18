@@ -77,8 +77,8 @@ async function register(params, callback) {
   }
 
   if (
-    params.gender.replace(/\s+/g, '') < 0 &&
-    params.gender.replace(/\s+/g, '') > 1) {
+    !(params.gender.toString().replace(/\s+/g, '') == 0) &&
+    !(params.gender.toString().replace(/\s+/g, '') == 1)) {
     return callback({ message: 'Gender Required' })
   }
 
