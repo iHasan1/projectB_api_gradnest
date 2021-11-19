@@ -57,6 +57,11 @@ async function register(params, callback) {
   if (params.username.replace(/\s+/g, '').length === 0) {
     return callback({ message: 'Username Required' });
   }
+  if (params.username.replace(/\s+/g, '').length > 15) {
+    return callback({
+      message: 'Username needs to be less than 15 characters!',
+    });
+  }
 
   if (
     params.email.replace(/\s+/g, '').length === 0 ||
@@ -70,6 +75,12 @@ async function register(params, callback) {
 
   if (params.full_name.replace(/\s+/g, '').length === 0) {
     return callback({ message: 'Full name Required' });
+  }
+
+  if (params.full_name.replace(/\s+/g, '').length > 30) {
+    return callback({
+      message: 'Full name needs to be less than 30 characters!',
+    })
   }
 
   if (params.country.replace(/\s+/g, '').length === 0) {
@@ -132,47 +143,55 @@ async function userProfile(id, callback){
     if(data < 1){
       return callback({ message: 'User does not exist!' })
     }
-
+    console.log(data[0]);
     return callback(null, data);
   });
 }
 
 async function updateUser(params, callback){
-  let selectQuery =
-    'UPDATE ?? SET ?? = ?, ?? = ?, ?? = ?, ?? = ?, ?? = ?, ?? = ? WHERE ?? = ?';
-  let query = mysql.format(selectQuery,[
-    "users",
-    "username",
-    params.username,
-    'full_name',
-    params.full_name,
-    'dob',
-    params.dob,
-    'gender',
-    params.gender,
-    'country',
-    params.country,
-    "email",
-    params.email,
-    "id",
-    params.id,
-  ]);
+  
+  if (params.username.replace(/\s+/g, '').length === 0) {
+    return callback('Username Required')
+  }
+
+  if (params.username.replace(/\s+/g, '').length >= 15) {
+    return callback('Username needs to be less than 15 characters!')
+  }
+
+  if (params.full_name.replace(/\s+/g, '').length === 0) {
+    return callback('Full name Required')
+  }
+
+  if (params.full_name.replace(/\s+/g, '').length > 30) {
+    return callback('Full name needs to be less than 30 characters!');
+  }
+
+let selectQuery = 'UPDATE ?? SET ?? = ?, ?? = ? WHERE ?? = ?'
+let query = mysql.format(selectQuery, [
+  'users',
+  'username',
+  params.username,
+  'full_name',
+  params.full_name,
+  'id',
+  params.id,
+])
 
   db.query(query, (err, data, fields) => {
     // console.log('Testing', data);
     if(err){
-      return callback({error:err}, {message:'Update Denied'});
+      return callback(err, 'Update Denied');
     }
     if(data.changedRows < 1){
-      return callback({ error: new Error('Could not update Mysql')}, {message:'Update Failed'});
+      return callback(new Error('Could not update Mysql'),'Update Failed');
     }
     
     return callback(
-      {error: false},
-      {message: "User Updated"}
+      null,
+      "User Updated"
     );
   });
-};
+}
 
 async function deactivateUser(params, callback){
   let selectQuery =
@@ -181,8 +200,8 @@ async function deactivateUser(params, callback){
     "users",
     "status",
     0,
-    "email",
-    params.email,
+    "id",
+    params.id,
   ]);
 
   db.query(query, (err, data) => {
@@ -202,4 +221,4 @@ module.exports = {
   userProfile,
   updateUser,
   deactivateUser,
-};
+}

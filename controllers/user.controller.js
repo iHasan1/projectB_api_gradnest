@@ -55,18 +55,19 @@ const userProfile = (req, res) => {
 };
 
 const updateUser = (req, res, next) => {
-  userServices.updateUser(req.body, ({error}, { message: results}) => {
+  userServices.updateUser(req.body, (error,  message) => {
+    console.log(error, message);
     if (error) {
       console.log(error);
       return res.status(400).send({
         message: 'Failed',
-        data: results,
+        data: error,
       }) 
     }
-    console.log(error, results)
+    console.log(error, message)
     return res.status(200).send({
       message: 'Success',
-      data: results,
+      data: message,
     })
   })
 };
